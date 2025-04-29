@@ -1,0 +1,39 @@
+version: '2.4'
+
+services:
+  influxdb:
+    image: influxdb:alpine
+    container_name: influxdb
+    restart: unless-stopped
+    mem_limit: 1400m
+    environment:
+      - name=value
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=edge
+      - DOCKER_INFLUXDB_INIT_PASSWORD=edgeadmin
+      - DOCKER_INFLUXDB_INIT_ORG=siemens
+      - DOCKER_INFLUXDB_INIT_BUCKET=edgedb
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=testtoken
+    logging:                            # allow logging
+      options:                          # we use best pactice here as limiting file size and rolling mechanism
+        max-size: "10m"                 # File size is 10MB
+        max-file: "2"
+      driver: json-file
+    volumes:                            # mount volume from host
+      - db-backup:/var/lib/influxdb
+    ports:                              # expose of ports and publish
+      - "38086:8086"                     # map containers port 8086 to host's port 38086
+    networks:                           # define networks connected to container 'influxdb' 
+      proxy-redirect: 
+
+###### NETWORK CONFIG ######
+networks:                           # Network interface configuration
+  proxy-redirect:                   # Reference 'proxy-redirect' as predefined network
+    external: 
+      name: proxy-redirect
+    driver: bridge
+
+###### VOLUMES ######
+volumes:                            # Volumes for containers
+  db-backup:

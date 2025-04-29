@@ -1,0 +1,29 @@
+version: "2.4"
+
+services:
+  ie-databus:
+    image: eclipse-mosquitto
+    container_name: ie-databus
+    ports:
+      - "1883:1883"
+    volumes:
+      - config:/mosquitto/config
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw
+      - ./config/pwfile:/mosquitto/config/pwfile:rw
+      - data:/mosquitto/data
+      - log:/mosquitto/log
+    restart: unless-stopped
+    networks:
+      - proxy-redirect
+
+volumes:
+  config:
+  data:
+  log:
+
+networks:
+  proxy-redirect:
+    external:
+      name: proxy-redirect
+    driver: bridge
+      

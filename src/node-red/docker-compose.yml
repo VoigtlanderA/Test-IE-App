@@ -1,0 +1,21 @@
+version: "2.4"
+
+services:
+  node-red:
+    image: nodered/node-red
+    ports:
+      - "1880:1880"
+    networks:
+      - proxy-redirect
+    volumes:
+      - data:/data
+    restart: unless-stopped
+
+networks:
+  proxy-redirect:
+    external:
+      name: proxy-redirect
+    driver: bridge
+
+volumes:
+  data:

@@ -1,0 +1,21 @@
+version: "2.4"
+
+services:
+  grafana:
+    image: grafana/grafana:11.6.1
+    networks:
+      - proxy-redirect
+    ports:
+      - 3000:3000
+    volumes:
+      - storage:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  storage:
+
+networks:
+  proxy-redirect:
+    external:
+      name: proxy-redirect
+    driver: bridge

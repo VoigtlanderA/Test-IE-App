@@ -1,0 +1,19 @@
+version: "2.4"
+
+services:
+  app2-base:
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "2"
+      driver: json-file
+    networks:
+      - proxy-redirect
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=edge
+      - DOCKER_INFLUXDB_INIT_PASSWORD=edgeadmin
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=edgeadmintoken
+      - DOCKER_INFLUXDB_INIT_ORG=novelis
+      - DOCKER_INFLUXDB_INIT_BUCKET=edge

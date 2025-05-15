@@ -1,0 +1,74 @@
+version: "2.4"
+
+services:
+  app2-influxdb:
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "2"
+      driver: json-file
+    networks:
+      - proxy-redirect
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=edge
+      - DOCKER_INFLUXDB_INIT_PASSWORD=edgeadmin
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=edgeadmintoken
+      - DOCKER_INFLUXDB_INIT_ORG=novelis
+      - DOCKER_INFLUXDB_INIT_BUCKET=edge
+    image: influxdb:2-alpine
+    mem_limit: 1400m
+    ports:
+      - 38086:8086
+    volumes:
+      - type: volume
+        source: influxdb2-data
+        target: /var/lib/influxdb2
+      - type: volume
+        source: influxdb2-config
+        target: /etc/influxdb2
+
+  app2-data-collector:
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "2"
+      driver: json-file
+    networks:
+      - proxy-redirect
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=edge
+      - DOCKER_INFLUXDB_INIT_PASSWORD=edgeadmin
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=edgeadmintoken
+      - DOCKER_INFLUXDB_INIT_ORG=novelis
+      - DOCKER_INFLUXDB_INIT_BUCKET=edge
+    image: voigtlandera/data-collector:v0.0.4
+    mem_limit: 1000m
+    depends_on:
+      - app2-influxdb
+
+#  app2-analyzer:
+#    extends:
+#      file: ./base.yml
+#      service: app2-base
+#    build: ./analyzer
+#    image: analyzer:v0.0.1
+#    mem_limit: 1000m
+#    depends_on:
+#      - app2-influxdb
+
+
+networks:
+  proxy-redirect:
+    external:
+      name: proxy-redirect
+    driver: bridge
+    
+
+volumes:
+  influxdb2-data:
+  influxdb2-config:
+  grafana-storage:

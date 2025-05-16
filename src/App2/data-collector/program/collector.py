@@ -11,10 +11,12 @@ import re
 
 from tags import tags_from_payload
 
+# logging config
 logger = logging.getLogger(__name__)
 logger.setLevel("WARNING")
 logging.basicConfig(format="%(asctime)s %(levelname)s  %(processName)s:%(pathname)s:%(lineno)d  %(message)s", style="%", datefmt="%Y-%m-%dT%H:%M:%S.%fZ")
 
+# influxdb config
 bucket = os.environ["DOCKER_INFLUXDB_INIT_BUCKET"]
 org = os.environ["DOCKER_INFLUXDB_INIT_ORG"]
 token = os.environ["DOCKER_INFLUXDB_INIT_ADMIN_TOKEN"]
@@ -34,7 +36,7 @@ write_api = influx_client.write_api(write_options=WriteOptions(
 ))
 
 
-
+# subscribe to topics on connection with mqtt databus
 def on_connect(client, userdata, flags, reason_code, properties):
     logger.info("Connected with result code %s", reason_code)
     client.subscribe("ie/d/j/simatic/v1/dsf_ls/dp/r/+/default", qos=0)
@@ -91,7 +93,8 @@ def on_sinamics1(client, userdata, msg):
             n += 1
             
     return
-    
+
+################################################### General on Message function ###############################################################   
 def on_message(client, userdata, msg):
     topic = msg.topic.split("/")
     match topic[5]:
@@ -103,7 +106,7 @@ def on_message(client, userdata, msg):
             print(f"No action defined for topic: {msg.topic}")
     
 
-
+################################################### Main Program ###############################################################
 mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 mqttc.username_pw_set("edge", "edge")
 mqttc.on_connect = on_connect
